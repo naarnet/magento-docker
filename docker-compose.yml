@@ -3,8 +3,8 @@
 version: '2'
 services:
   app:
-    build: ./magento-docker/nginx 
 #    image: registry.qbo.tech:5000/magento2-nginx-dev:latest
+    build: ./magento-docker/nginx 
     links:
       - phpfpm
       - db
@@ -23,15 +23,16 @@ services:
       - ~/.composer:/root/.composer
 
   phpfpm:
-    build: ./magento-docker/phpfpm/php-7.2
-#Magento 2.1.x (php-fpm 7.0.8)
+#    Magento 2.1.x (php-fpm 7.0.8)
+#    build: ./magento-docker/phpfpm/php-7.0
 #    image: registry.qbo.tech:5000/magento2-phpfpm:7.0.8
-#Magento 2.2.x (php-fpm 7.1)
-#    image: registry.qbo.tech:5000/magento2-phpfpm:latest
+
+#    Magento 2.2.x (php-fpm 7.1)
+#    build: ./magento-docker/phpfpm/php-7.1
+
 #   Magento 2.3.0 (php-fpm 7.2)
 #    image: registry.qbo.tech:5000/magento2-phpfpm:7.2
-
-#    image: registry.qbo.tech:5000/magento2-phpfpm:latest
+    build: ./magento-docker/phpfpm/php-7.2
     links:
       - db
     volumes_from:

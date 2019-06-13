@@ -1,5 +1,5 @@
 FROM nginx:1.11
-MAINTAINER Jose Castaneda <jose@qbo.tech>
+MAINTAINER Nestor Alain <naarnet10@gmail.com>
 
 ENV PHP_HOST phpfpm
 ENV PHP_PORT 9000
