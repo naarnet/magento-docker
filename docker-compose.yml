@@ -1,0 +1,110 @@
+# Mage Inferno Docker Compose (https://github.com/mageinferno/magento2-docker-compose)
+# Version 4.1.1
+version: '2'
+services:
+  app:
+    image: registry.qbo.tech:5000/magento2-nginx-dev:latest
+    links:
+      - phpfpm
+      - db
+    volumes_from:
+      - appdata
+    ports:
+      - 8018:80
+    environment:
+      - MAGE_MODE=default
+  appdata:
+    image: tianon/true
+    volumes:
+      - /srv/www
+      - ~/.composer:/var/www/.composer
+      - ./www:/srv/www/
+      - ~/.composer:/root/.composer
+
+  phpfpm:
+    build: ./magento-docker/phpfpm/php-7.2
+#Magento 2.1.x (php-fpm 7.0.8)
+#    image: registry.qbo.tech:5000/magento2-phpfpm:7.0.8
+#Magento 2.2.x (php-fpm 7.1)
+#    image: registry.qbo.tech:5000/magento2-phpfpm:latest
+#   Magento 2.3.0 (php-fpm 7.2)
+#    image: registry.qbo.tech:5000/magento2-phpfpm:7.2
+
+#    image: registry.qbo.tech:5000/magento2-phpfpm:latest
+    links:
+      - db
+    volumes_from:
+      - appdata
+    environment:
+      - M2_BASE_URL=http://mage2.local:8018/
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=magento2
+      - MYSQL_USER=magento2
+      - MYSQL_PASSWORD=magento2
+
+  db:
+    image: mysql:5.7
+    volumes_from:
+      - dbdata
+    ports:
+      - 3314:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=magento2
+      - MYSQL_DATABASE=magento2
+      - MYSQL_USER=magento2
+      - MYSQL_PASSWORD=magento2
+
+  dbdata:
+    image: tianon/true
+    volumes:
+      - /var/lib/mysql
+
+  setup:
+#    build: ./setup/setup-7.0
+    build: ./magento-docker/setup/setup-7.2
+#    image: registry.qbo.tech:5000/magento2-setup:latest
+    command: /usr/local/bin/mage-setup
+    links:
+      - db
+    volumes_from:
+      - appdata
+    environment:
+      - M2SETUP_DB_HOST=db
+      - M2SETUP_DB_NAME=magento2
+      - M2SETUP_DB_USER=magento2
+      - M2SETUP_DB_PASSWORD=magento2
+      - M2_BASE_URL=http://mage2.local:8018/
+      - M2SETUP_ADMIN_FIRSTNAME=Admin
+      - M2SETUP_ADMIN_LASTNAME=User
+      - M2SETUP_ADMIN_EMAIL=dummy@gmail.com
+      - M2SETUP_ADMIN_USER=magento2
+      - M2SETUP_ADMIN_PASSWORD=magento2
+      - M2SETUP_VERSION=2.3.0
+      - M2SETUP_USE_SAMPLE_DATA=true
+      - M2SETUP_USE_ARCHIVE=true
+      - M2SETUP_LANGUAGE=es_MX
+      - M2SETUP_TIMEZONE=America/Mexico_City
+      - M2SETUP_USE_COMPOSER_ENTERPRISE=false
+      - M2SETUP_CURRENCY=MXN
+
+  grunt:
+    image: jcastaneda/magento2-phpfpm-grunt:latest
+    volumes_from:
+      - appdata
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+     - db
+    environment:
+     - PMA_ARBITRARY=1
+     - PMA_HOST="db"
+     - MYSQL_USERNAME=root
+     - MYSQL_ROOT_PASSWORD=magento2
+     - PHP_UPLOAD_MAX_FILESIZE=500M
+    restart: always
+    ports:
+     - "8076:80"
+    volumes:
+     - /sessions
+    restart: always
