@@ -3,7 +3,8 @@
 version: '2'
 services:
   app:
-    image: registry.qbo.tech:5000/magento2-nginx-dev:latest
+    build: ./magento-docker/nginx 
+#    image: registry.qbo.tech:5000/magento2-nginx-dev:latest
     links:
       - phpfpm
       - db

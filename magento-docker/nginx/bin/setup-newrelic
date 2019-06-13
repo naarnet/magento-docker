@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+if [[ ${NR_APP_NAME} ]]; then
+  echo "Enabling APM metrics for ${NR_APP_NAME}"
+ 
+  # Update the application name
+  sed -i "s/^\(newrelic\_license_key\s*=\s*\).*$/\1${NR_INSTALL_KEY}/" /etc/nginx-nr-agent/nginx-nr-agent.ini
+  sed -i "s/^\(name\s*=\s*\).*$/\1${NR_APP_NAME}/" /etc/nginx-nr-agent/nginx-nr-agent.ini
+  service nginx-nr-agent start
+fi
